@@ -1,0 +1,412 @@
+
+import java.awt.Font;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.Duration;
+import java.time.LocalTime;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.util.Calendar;
+import java.util.Random;
+class DesignWindow implements Runnable{
+ 
+JFrame jFrm;
+ 
+JLabel jLblNumber1, jLblNumber2, jLblNumber3,
+ 
+jLblNumber4, jLblResult;
+ 
+JTextField jTxtNumbers;
+ 
+JButton jButtonStart, jButtonStop, jCheckAnswer;
+ 
+Thread t;
+ 
+boolean start;
+ 
+int n1,n2,n3,n4,score;
+ 
+LocalTime startTime, endTime;
+ 
+Timer timer2;
+ 
+Timer time;
+ 
+public static int count = 0;
+ 
+ 
+DesignWindow(){
+ 
+t = new Thread(this, "Memory Game");
+ 
+designWindow();
+}
+ 
+void designWindow() {
+ 
+jFrm = new JFrame("Memory Game");
+ 
+jFrm.getContentPane().setLayout(null); 
+ 
+jFrm.setSize(500, 350);
+ 
+jFrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ 
+ 
+JLabel jLblNumber1 = new JLabel("N1");
+ 
+jLblNumber1.setFont(new Font("Dialog", Font.BOLD, 20));
+ 
+jLblNumber1.setBounds(150, 12, 321, 50);
+ 
+jFrm.getContentPane().add(jLblNumber1);
+ 
+ 
+JLabel jLblNumber2 = new JLabel("N2");
+ 
+jLblNumber2.setFont(new Font("Dialog", Font.BOLD, 20));
+ 
+jLblNumber2.setBounds(192, 12, 321, 50);
+ 
+jFrm.getContentPane().add(jLblNumber2);
+ 
+ 
+JLabel jLblNumber3 = new JLabel("N3");
+ 
+jLblNumber3.setFont(new Font("Dialog", Font.BOLD, 20));
+ 
+jLblNumber3.setBounds(235, 12, 321, 50);
+ 
+jFrm.getContentPane().add(jLblNumber3);
+ 
+ 
+JLabel jLblNumber4 = new JLabel("N4");
+ 
+jLblNumber4.setFont(new Font("Dialog", Font.BOLD, 20));
+ 
+jLblNumber4.setBounds(275, 12, 321, 50);
+ 
+jFrm.getContentPane().add(jLblNumber4);
+ 
+ 
+JLabel jLblResult = new JLabel("Result");
+ 
+jLblResult.setFont(new Font("Dialog", Font.BOLD, 16));
+ 
+jLblResult.setBounds(115, 220, 300, 100);
+ 
+jFrm.getContentPane().add(jLblResult);
+ 
+ 
+jTxtNumbers = new JTextField();
+ 
+jTxtNumbers.setBounds(115, 70, 220, 30);
+ 
+jFrm.getContentPane().add(jTxtNumbers);
+ 
+jTxtNumbers.setColumns(10);
+ 
+ 
+ 
+ 
+ 
+JButton jButtonStart = new JButton("Start Game");
+ 
+jButtonStart.addActionListener(new ActionListener() {
+ 
+@Override
+ 
+public void actionPerformed(ActionEvent e) {
+ 
+start = true;
+ 
+score = 0;
+ 
+startTime = LocalTime.now();
+ 
+endTime = startTime.plusSeconds(60);
+ 
+Random random = new Random();
+ 
+ 
+time = new Timer(true);
+ 
+time.schedule(new TimerTask(){
+
+ 
+@Override
+ 
+public void run() {
+ 
+n1 = random.nextInt(99);
+ 
+jLblNumber1.setText(Integer.toString(n1));
+ 
+ 
+n2 = random.nextInt(99);
+ 
+jLblNumber2.setText(Integer.toString(n2));
+ 
+ 
+n3 = random.nextInt(99);
+ 
+jLblNumber3.setText(Integer.toString(n3));
+ 
+ 
+n4 = random.nextInt(99);
+ 
+jLblNumber4.setText(Integer.toString(n4));
+ 
+ 
+}
+ 
+}, 10, 10000);
+ 
+ 
+timer2 = new Timer(true);
+ 
+timer2.schedule(new TimerTask(){
+ 
+@Override
+ 
+public void run() {
+ 
+jLblNumber1.setText(" ");
+ 
+jLblNumber2.setText(" ");
+ 
+jLblNumber3.setText(" ");
+ 
+jLblNumber4.setText(" ");
+ 
+}
+ 
+}, 5000, 5000);
+ 
+jLblResult.setText("Score: 0 0 seconds elapsed");
+ 
+try {
+ 
+if (!t.isAlive()) {
+ 
+t.start();
+ 
+}
+ 
+ 
+}catch(IllegalThreadStateException i) {
+ 
+jLblResult.setText("Cannot start again");
+ 
+ 
+}
+ 
+ 
+ 
+ 
+}
+ 
+ 
+});
+ 
+ 
+ 
+jButtonStart.setBounds(60, 115, 170, 40);
+ 
+jFrm.getContentPane().add(jButtonStart);
+ 
+ 
+ 
+JButton jButtonStop = new JButton("Stop Game");
+ 
+jButtonStop.addActionListener(new ActionListener() {
+ 
+@Override
+ 
+public void actionPerformed(ActionEvent e) {
+ 
+try {
+ 
+jLblNumber1.setText("N1");
+ 
+jLblNumber2.setText("N2");
+ 
+jLblNumber3.setText("N3");
+ 
+jLblNumber4.setText("N4");
+ 
+ 
+jLblResult.setText("Game ended. Score: " + score);
+ 
+ 
+time.cancel();
+ 
+timer2.cancel();
+ 
+ 
+t.interrupt();
+ 
+ 
+}catch (NullPointerException n) {
+ 
+jLblResult.setText("Cannot stop game.");
+ 
+}
+ 
+}
+ 
+});
+ 
+jButtonStop.setBounds(235, 115, 170, 40);
+ 
+jFrm.getContentPane().add(jButtonStop);
+ 
+ 
+ 
+JButton jCheckAnswer = new JButton("Check Answer");
+ 
+jCheckAnswer.addActionListener(new ActionListener() {
+ 
+@Override
+ 
+public void actionPerformed(ActionEvent e) {
+ 
+try { 
+ 
+if (score < 4) {
+ 
+String input = jTxtNumbers.getText();
+ 
+String correct = n1 + "," + n2 + "," + n3 + "," + n4;
+ 
+String correct2 = n1 + ", " + n2 + ", " + n3 + ", " + n4;
+ 
+
+ 
+if (input.equals(correct) || input.equals(correct2)) 
+ 
+score += 1;
+ 
+else
+ 
+score -= 1;
+ 
+ 
+endTime = LocalTime.now();
+ 
+Duration d = Duration.between(startTime, endTime);
+ 
+d.toSeconds();
+ 
+String dur = d.toString();
+String sec = dur.replace("PT", "");
+ 
+sec = sec.replace("S", "");
+ 
+sec = sec.replace("1M", "");
+ 
+int elapsed = Math.round(Float.parseFloat(sec));
+ 
+jLblResult.setText("Score: " + score + " " + elapsed + " seconds elapsed");
+ 
+ 
+endTime = LocalTime.now();
+ 
+int timeVal = startTime.plusSeconds(60).compareTo(endTime);
+ 
+if (timeVal <= 0) {
+ 
+ 
+jLblNumber1.setText("N1");
+ 
+jLblNumber2.setText("N2");
+ 
+jLblNumber3.setText("N3");
+ 
+jLblNumber4.setText("N4");
+ 
+ 
+jLblResult.setText("You lost. Score: " + score);
+ 
+time.cancel();
+ 
+timer2.cancel();
+ 
+ 
+}
+ 
+}
+ 
+else{
+ 
+jLblResult.setText("You win! Score: 5");
+ 
+jLblNumber1.setText("N1");
+ 
+jLblNumber2.setText("N2");
+ 
+jLblNumber3.setText("N3");
+ 
+jLblNumber4.setText("N4");
+ 
+ 
+ 
+time.cancel();
+ 
+timer2.cancel();
+ 
+}
+ 
+}catch(NullPointerException N) {
+ 
+jLblResult.setText("Cannot check answer.");
+ 
+}
+ 
+}
+ 
+ 
+ 
+});
+ 
+jCheckAnswer.setBounds(150, 160, 170, 40);
+ 
+jFrm.getContentPane().add(jCheckAnswer);
+ 
+ 
+jFrm.setVisible(true);
+ 
+ 
+}
+ 
+@Override
+ 
+public void run() {
+ 
+ 
+try {
+ 
+Thread.sleep(10);
+ 
+}catch(InterruptedException e) {
+ 
+start = false;
+ 
+t = new Thread(this, "New Thread");
+ 
+}
+ 
+}
+}
+class PlayGame {
+ 
+public static void main(String[] args) {
+ 
+new DesignWindow();
+ 
+}
+}
